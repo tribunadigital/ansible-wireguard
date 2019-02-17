@@ -1,0 +1,35 @@
+---
+- name: 'Set var privatekey is empty'
+  set_fact:
+    privatekey: {}
+
+- name: "Read private key {{ item }}"
+  stat:
+    path: "/etc/wireguard/privatekey_{{ item }}"
+  register: privatekey
+
+- name: "Generate wireguard keys {{ item }}"
+  shell: "umask 077; wg genkey | tee /etc/wireguard/privatekey_{{ item }} | wg pubkey > /etc/wireguard/publickey_{{ item }}"
+  when: not privatekey.stat.exists
+
+- name: "Read private key {{ item }}"
+  slurp:
+    src: "/etc/wireguard/privatekey_{{ item }}"
+  register: privatedata
+
+- name: "Read public key {{ item }}"
+  slurp:
+    src: "/etc/wireguard/publickey_{{ item }}"
+  register: publicdata
+
+- name: 'Set var private and public'
+  set_fact:
+    private: >
+      {%  set _private = private | default({}) -%}
+      {%- set x=_private.__setitem__(item, privatedata) -%}
+      {{- _private }}
+    public: >
+      {%  set _public = public | default({}) -%}
+      {%- set x=_public.__setitem__(item, publicdata) -%}
+      {{- _public }}
+

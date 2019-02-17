@@ -10,6 +10,23 @@
     owner: root
     group: root
 
+- name: 'Create wireguard systemd file'
+  template:
+    src: wg-quick.service.j2
+    dest: '/lib/systemd/system/wg-quick@.service'
+    mode: '0644'
+  register: systemd_wg
+
+- name: 'Systemd daemon reload'
+  command: 'systemctl daemon-reload'
+  when: systemd_wg is changed
+
+- include_tasks: configure_keys.yml
+  with_items: "{{ wireguard_interfaces }}"
+  tags:
+    - configure
+  when: wireguard_manage_keys
+
 - include_tasks: configure_network.yml
   with_items: "{{ wireguard_interfaces }}"
   tags:

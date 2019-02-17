@@ -3,4 +3,4 @@
   apt_repository:
     repo: 'ppa:wireguard/wireguard'
     state: present
-  when: ansible_distribution == 'Ubuntu'
+

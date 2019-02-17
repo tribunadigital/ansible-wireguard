@@ -1,45 +1,22 @@
 ---
-- name: Read private key {{ item }}
-  stat:
-    path: "/etc/wireguard/privatekey_{{ item }}"
-  register: privatekey_{{ item }}
-  when: wireguard_manage_keys
-
-- name: Generate wireguard keys {{ item }}
-  shell: "umask 077; wg genkey | tee /etc/wireguard/privatekey_{{ item }} | wg pubkey > /etc/wireguard/publickey_{{ item }}"
-  when:
-    - not privatekey_{{ item }}.stat.exists
-    - wireguard_manage_keys
-
-- name: Read private key {{ item }}
-  slurp:
-    src: "/etc/wireguard/privatekey_{{ item }}"
-  register: private_{{ item }}
-  when: wireguard_manage_keys
-
-- name: Read public key {{ item }}
-  slurp:
-    src: "/etc/wireguard/publickey_{{ item }}"
-  register: public_{{ item }}
-  when: wireguard_manage_keys
-
-- name: Configure {{ item }}
+- name: "Configure {{ item }}"
   template:
     src: wgX.conf.j2
-    dest: /etc/wireguard/{{ item }}.conf
+    dest: "/etc/wireguard/{{ item }}.conf"
     mode: '0400'
   register: configuration
 
-- name: Enable wg-quick@{{ item }} service
+- name: "Enable wg-quick@{{ item }} service"
   service:
-    name: wg-quick@{{ item }}
+    name: "wg-quick@{{ item }}"
     state: started
     enabled: yes
   tags: install
   when: wireguard_manage_services
 
-- name: Restart wg-quick@{{ item }}
+- name: "Restart wg-quick@{{ item }}"
   service:
-    name: wg-quick@{{ item }}
+    name: "wg-quick@{{ item }}"
     state: restarted
-  when: configuration is changed and wireguard_manage_services
+  when: (configuration is changed and wireguard_manage_services) or (upgrade is changed and wireguard_manage_services)
+

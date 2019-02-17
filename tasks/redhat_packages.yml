@@ -15,5 +15,6 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - wireguard-dkms
-    - wireguard-tools
+    - "{{ 'wireguard-dkms-' + wireguard_version if wireguard_version != '' else 'wireguard-dkms' }}"
+    - "{{ 'wireguard-tools-' + wireguard_version if wireguard_version != '' else 'wireguard-tools' }}"
+  register: upgrade

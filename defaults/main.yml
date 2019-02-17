@@ -1,6 +1,7 @@
 ---
 wireguard_manage_keys: False
 wireguard_manage_services: True
+wireguard_version: ''
 
 wireguard_interfaces: []
 # wireguard_interfaces:
