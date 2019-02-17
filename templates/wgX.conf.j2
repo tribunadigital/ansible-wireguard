@@ -35,7 +35,7 @@
 {% endif %}
 {% endfor %}
 
-{% for peer_name, peer in peers.items() %}
+{% for peer_name, peer in peers | dictsort %}
 [Peer] # {{ peer_name }}
 {% for key, option in peer_required_keys.items() %}
 {{ option }} = {{ peer[key] }}
