@@ -2,6 +2,9 @@
 Description=WireGuard via wg-quick(8) for %I
 After=network-online.target
 Wants=network-online.target
+{% if wireguard_docker_before -%}
+Before=docker.socket
+{% endif -%}
 Documentation=man:wg-quick(8)
 Documentation=man:wg(8)
 Documentation=https://www.wireguard.com/
