@@ -18,5 +18,5 @@
   service:
     name: "wg-quick@{{ item }}"
     state: restarted
-  when: (configuration is changed and wireguard_manage_services) or (upgrade is changed and wireguard_manage_services)
+  when: (configuration is changed and wireguard_manage_services)
 

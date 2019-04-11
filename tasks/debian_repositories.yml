@@ -3,6 +3,8 @@
     dest: /etc/apt/sources.list.d/unstable-wireguard.list
     content: |
       deb http://deb.debian.org/debian/ unstable main
+  tags:
+    - wireguard_install
 
 - copy:
     dest: /etc/apt/preferences.d/limit-unstable
@@ -10,4 +12,6 @@
       Package: *
       Pin: release a=unstable
       Pin-Priority: 150
+  tags:
+    - wireguard_install
 

@@ -7,4 +7,6 @@
       - "linux-headers-{{ ansible_kernel }}"
     state: present
     update_cache: yes
+  tags:
+    - wireguard_install
 

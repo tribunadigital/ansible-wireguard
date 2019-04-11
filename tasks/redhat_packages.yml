@@ -3,12 +3,16 @@
   get_url:
     dest: /etc/yum.repos.d/_copr_jdoss-wireguard.repo
     url: "https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/{{ (ansible_distribution == 'Fedora') | ternary('fedora', 'epel') }}-{{ ansible_distribution_major_version }}/jdoss-wireguard-{{ (ansible_distribution == 'Fedora') | ternary('fedora', 'epel') }}-{{ ansible_distribution_major_version }}.repo"
+  tags:
+    - wireguard_install
 
 - name: Enable EPEL
   package:
     name: epel-release
     state: present
   when: ansible_distribution != "Fedora"
+  tags:
+    - wireguard_install
 
 - name: Install wireguard
   package:
@@ -18,3 +22,7 @@
     - "{{ 'wireguard-dkms-' + wireguard_version if wireguard_version != '' else 'wireguard-dkms' }}"
     - "{{ 'wireguard-tools-' + wireguard_version if wireguard_version != '' else 'wireguard-tools' }}"
   register: upgrade
+  tags:
+    - wireguard_install
+    - wireguard_upgrade
+

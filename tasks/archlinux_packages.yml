@@ -6,3 +6,7 @@
   with_items:
     - wireguard-dkms
     - wireguard-tools
+  tags:
+    - wireguard_install
+    - wireguard_upgrade
+
