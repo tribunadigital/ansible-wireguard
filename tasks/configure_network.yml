@@ -6,17 +6,37 @@
     mode: '0400'
   register: configuration
 
-- name: "Enable wg-quick@{{ item }} service"
+- name: "Default manage wg-quick@{{ item }} service"
   service:
     name: "wg-quick@{{ item }}"
     state: started
     enabled: yes
   tags: install
-  when: wireguard_manage_services
+  when: (wireguard_manage_services and not item.service is defined)
 
-- name: "Restart wg-quick@{{ item }}"
+- name: "Default restart wg-quick@{{ item }}"
   service:
     name: "wg-quick@{{ item }}"
     state: restarted
-  when: (configuration is changed and wireguard_manage_services)
+  when: >
+    (configuration is changed and
+      wireguard_manage_services and
+      not item.service is defined)
+
+- name: "Custom manage wg-quick@{{ item }} service"
+  service:
+    name: "wg-quick@{{ item }}"
+    state: "{{ 'started' if item.service == 'yes' else 'stopped' }}"
+    enabled: "{{ item.service }}"
+  tags: install
+  when: (wireguard_manage_services and item.service is defined)
+
+- name: "Custom restart wg-quick@{{ item }}"
+  service:
+    name: "wg-quick@{{ item }}"
+    state: "{{ 'restarted' if item.service == 'yes' else 'stopped' }}"
+  when: >
+    (configuration is changed and
+      wireguard_manage_services and
+      item.service is defined)
 

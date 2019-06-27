@@ -58,11 +58,8 @@
   tags:
     - wireguard_upgrade
 
-- name: 'Restart wg-quick@*'
-  service:
-    name: 'wg-quick@*'
-    state: restarted
-  when: (upgrade is changed and wireguard_manage_services)
+- include_tasks: restart.yml
+  with_items: "{{ wireguard_interfaces }}"
   tags:
     - wireguard_upgrade
 
