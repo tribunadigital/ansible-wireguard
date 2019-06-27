@@ -32,13 +32,13 @@
     - wireguard_upgrade
 
 - include_tasks: configure_keys.yml
-  with_items: "{{ wireguard_interfaces }}"
+  loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
     - wireguard_configure
   when: wireguard_manage_keys
 
 - include_tasks: configure_network.yml
-  with_items: "{{ wireguard_interfaces }}"
+  loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
     - wireguard_configure
 
@@ -59,7 +59,7 @@
     - wireguard_upgrade
 
 - include_tasks: restart.yml
-  with_items: "{{ wireguard_interfaces }}"
+  loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
     - wireguard_upgrade
 

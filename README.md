@@ -179,7 +179,8 @@ wireguard_wg0_peer_settings: >
 wireguard_manage_keys: True
 wireguard_manage_services: True
 wireguard_interfaces:
-  - wg0
+  wg0:
+    service: 'no'
 
 wireguard_peers: 
   wg0: "{{ wireguard_wg0_peer_settings }}"
@@ -204,7 +205,8 @@ server3 wg0_ipv4=10.0.0.3/32
 - hosts: all
   vars:
     wireguard_interfaces:
-      - wg0
+  wg0:
+    service: 'no'
   roles:
      - wireguard
 ```

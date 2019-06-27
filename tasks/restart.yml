@@ -6,18 +6,18 @@
   when: > 
     (upgrade is changed and
       wireguard_manage_services and
-      not item.service is defined)
+      not wireguard_interfaces[item]['service'] is defined)
   tags:
     - wireguard_upgrade
 
 - name: "Custom upgrade restart wg-quick@{{ item }} service"
   service:
     name: "wg-quick@{{ item }}"
-    state: "{{ 'restarted' if item.service == 'yes' else 'stopped' }}"
+    state: "{{ 'restarted' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
   when: >
     (upgrade is changed and
       wireguard_manage_services and
-      item.service is defined)
+      wireguard_interfaces[item]['service'] is defined)
   tags:
     - wireguard_upgrade
 

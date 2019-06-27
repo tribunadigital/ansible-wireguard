@@ -12,7 +12,7 @@
     state: started
     enabled: yes
   tags: install
-  when: (wireguard_manage_services and not item.service is defined)
+  when: (wireguard_manage_services and not wireguard_interfaces[item]['service'] is defined)
 
 - name: "Default restart wg-quick@{{ item }}"
   service:
@@ -21,22 +21,22 @@
   when: >
     (configuration is changed and
       wireguard_manage_services and
-      not item.service is defined)
+      not wireguard_interfaces[item]['service'] is defined)
 
 - name: "Custom manage wg-quick@{{ item }} service"
   service:
     name: "wg-quick@{{ item }}"
-    state: "{{ 'started' if item.service == 'yes' else 'stopped' }}"
-    enabled: "{{ item.service }}"
+    state: "{{ 'started' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
+    enabled: "{{ wireguard_interfaces[item]['service'] }}"
   tags: install
-  when: (wireguard_manage_services and item.service is defined)
+  when: (wireguard_manage_services and wireguard_interfaces[item]['service'] is defined)
 
 - name: "Custom restart wg-quick@{{ item }}"
   service:
     name: "wg-quick@{{ item }}"
-    state: "{{ 'restarted' if item.service == 'yes' else 'stopped' }}"
+    state: "{{ 'restarted' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
   when: >
     (configuration is changed and
       wireguard_manage_services and
-      item.service is defined)
+      wireguard_interfaces[item]['service'] is defined)
 
