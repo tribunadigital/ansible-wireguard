@@ -2,8 +2,8 @@
 Description=WireGuard via wg-quick(8) for %I
 After=network-online.target nss-lookup.target
 Wants=network-online.target nss-lookup.target
-{% if wireguard_docker_before -%}
-Before=docker.socket
+{% if wireguard_systemd_unit_before | length > 0 -%}
+Before={{ wireguard_systemd_unit_before | join(' ') }}
 {% endif -%}
 Documentation=man:wg-quick(8)
 Documentation=man:wg(8)

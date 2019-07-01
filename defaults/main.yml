@@ -1,5 +1,5 @@
 ---
-wireguard_docker_before: False
+wireguard_systemd_unit_before: []
 wireguard_manage_keys: False
 wireguard_manage_services: True
 wireguard_version: ''
