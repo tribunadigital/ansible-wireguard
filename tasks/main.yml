@@ -42,22 +42,6 @@
   tags:
     - wireguard_configure
 
-- name: 'Remove wireguard module'
-  modprobe:
-    name: wireguard
-    state: absent
-  when: (upgrade is changed and wireguard_manage_services)
-  tags:
-    - wireguard_upgrade
-
-- name: 'Load wireguard module'
-  modprobe:
-    name: wireguard
-    state: present
-  when: (upgrade is changed and wireguard_manage_services)
-  tags:
-    - wireguard_upgrade
-
 - include_tasks: restart.yml
   loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
