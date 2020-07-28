@@ -2,7 +2,7 @@
 - name: Add Ubuntu repositories
   apt_repository:
     repo: 'ppa:wireguard/wireguard'
-    state: present
+    state: "{{ 'absent' if ansible_distribution_version is version('18.04', '>=') else 'present' }}"
   tags:
     - wireguard_install
 
