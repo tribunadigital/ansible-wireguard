@@ -14,12 +14,13 @@
   tags: install
   when: (wireguard_manage_services and wireguard_interfaces[item]['service'] is defined)
 
-- name: "Restart wg-quick@{{ item }}"
-  service:
-    name: "wg-quick@{{ item }}"
-    state: "{{ 'restarted' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
+- name: "Reconfigure wg-quick@{{ item }}"
+  shell: "wg syncconf {{ item }} <(wg-quick strip {{ item }})"
+  args:
+    executable: /bin/bash
   when: >
     (configuration is changed and
       wireguard_manage_services and
-      wireguard_interfaces[item]['service'] is defined)
+      wireguard_interfaces[item]['service'] is defined and
+      wireguard_interfaces[item]['service'] == 'yes')
 
