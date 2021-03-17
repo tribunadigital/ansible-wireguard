@@ -6,7 +6,8 @@
   when: >
     (upgrade is changed and
       wireguard_manage_services and
-      wireguard_interfaces[item]['service'] is defined)
+      wireguard_interfaces[item]['service'] is defined and
+      wireguard_upgrade_restart)
   tags:
     - wireguard_upgrade
 

@@ -2,6 +2,7 @@
 wireguard_systemd_unit_before: []
 wireguard_manage_keys: False
 wireguard_manage_services: True
+wireguard_upgrade_restart: True
 wireguard_version: ''
 wireguard_dkms_version: ''
 wireguard_tools_version: ''
