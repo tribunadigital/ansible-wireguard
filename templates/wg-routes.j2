@@ -1,0 +1,38 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+set -e -o pipefail
+shopt -s extglob
+export LC_ALL=C
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+export PATH="${SELF%/*}:$PATH"
+
+if [ -z "$1" ]; then
+  echo "Need network interface name! Usage: ${SELF} IFNAME"
+  exit 1
+fi
+
+INTERFACE="${1}"
+
+NEW_ROUTES_FILE=`mktemp`
+OLD_ROUTES_FILE=`mktemp`
+
+for i in $(while read -r _ i; do for i in $i; do [[ $i =~ ^[0-9a-z:.]+/[0-9]+$ ]] && echo "$i"; done; done < <(wg show "${INTERFACE}" allowed-ips) | sort -nr -k 2 -t /); do
+  echo "$i"
+done | sed "s|/32||" | sort > $NEW_ROUTES_FILE
+
+ip route | grep "\s${INTERFACE}\s" | cut -d ' ' -f 1 | sort > $OLD_ROUTES_FILE
+
+for i in `diff $NEW_ROUTES_FILE $OLD_ROUTES_FILE | grep '<' | cut -d ' ' -f 2`; do
+  ip route add $i dev $INTERFACE
+done
+
+for i in `diff $NEW_ROUTES_FILE $OLD_ROUTES_FILE | grep '>' | cut -d ' ' -f 2`; do
+  ip route del $i dev $INTERFACE
+done
+
+rm -f $NEW_ROUTES_FILE $OLD_ROUTES_FILE
+
+exit 0
+

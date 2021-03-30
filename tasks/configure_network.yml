@@ -14,8 +14,18 @@
   tags: install
   when: (wireguard_manage_services and wireguard_interfaces[item]['service'] is defined)
 
-- name: "Reconfigure wg-quick@{{ item }}"
+- name: "Sync config of wireguard interface {{ item }}"
   shell: "wg syncconf {{ item }} <(wg-quick strip {{ item }})"
+  args:
+    executable: /bin/bash
+  when: >
+    (configuration is changed and
+      wireguard_manage_services and
+      wireguard_interfaces[item]['service'] is defined and
+      wireguard_interfaces[item]['service'] == 'yes')
+
+- name: "Sync routes of wireguard interface {{ item }}"
+  shell: "/usr/local/bin/wg-routes {{ item }}"
   args:
     executable: /bin/bash
   when: >

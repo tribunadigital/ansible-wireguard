@@ -16,6 +16,17 @@
 
 - name: 'Create wireguard systemd file'
   template:
+    src: wg-routes.j2
+    dest: '/usr/local/bin/wg-routes'
+    mode: '0755'
+    validate: '/bin/bash -n %s'
+  tags:
+    - wireguard_install
+    - wireguard_upgrade
+    - wireguard_configure
+
+- name: 'Create wireguard systemd file'
+  template:
     src: wg-quick.service.j2
     dest: '/lib/systemd/system/wg-quick@.service'
     mode: '0644'
