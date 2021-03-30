@@ -14,7 +14,7 @@
     - wireguard_install
     - wireguard_upgrade
 
-- name: 'Create wireguard systemd file'
+- name: 'Create script for sunc routes'
   template:
     src: wg-routes.j2
     dest: '/usr/local/bin/wg-routes'
