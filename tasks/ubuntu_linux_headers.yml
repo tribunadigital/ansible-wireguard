@@ -1,7 +1,6 @@
 ---
-
 - name: Install linux headers (Ubuntu)
-  apt:
+  ansible.builtin.apt:
     name:
       - linux-headers-generic
       - "linux-headers-{{ ansible_kernel }}"

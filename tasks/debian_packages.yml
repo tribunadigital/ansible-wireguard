@@ -1,8 +1,9 @@
 ---
-- include_tasks: "{{ ansible_distribution | lower }}_repositories.yml"
+- ansible.builtin.include_tasks: "{{ ansible_distribution | lower }}_repositories.yml"
   tags:
     - wireguard_install
-- include_tasks: "{{ ansible_distribution | lower }}_linux_headers.yml"
+
+- ansible.builtin.include_tasks: "{{ ansible_distribution | lower }}_linux_headers.yml"
   tags:
     - wireguard_install
 

@@ -1,0 +1,13 @@
+---
+- name: Install wireguard-tools
+  community.general.homebrew:
+    name:
+      - wireguard-tools
+      - bash
+    state: latest
+  register: upgrade
+  become: False
+  tags:
+    - wireguard_install
+    - wireguard_upgrade
+

@@ -1,7 +1,7 @@
 ---
 
 - name: Install kernel headers (Debian)
-  apt:
+  ansible.builtin.apt:
     name: "linux-headers-{{ ansible_kernel }}"
     state: present
     update_cache: yes

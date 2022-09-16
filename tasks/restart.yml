@@ -1,13 +1,23 @@
 ---
 - name: "Upgrade restart wg-quick@{{ item }} service"
-  service:
-    name: "wg-quick@{{ item }}"
+  ansible.builtin.service:
+    name: "wg-quick@{{ item }}.service"
     state: "{{ 'restarted' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
   when: >
-    (upgrade is changed and
+    ( upgrade is changed and
       wireguard_manage_services and
       wireguard_interfaces[item]['service'] is defined and
-      wireguard_upgrade_restart)
-  tags:
-    - wireguard_upgrade
+      wireguard_upgrade_restart and
+      ansible_os_family != 'Darwin' )
+
+- name: "Manage launchd {{ item }} service"
+  community.general.launchd:
+    name: "no.corporate.wireguard.{{ item }}"
+    state: "{{ 'started' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
+  when: >
+    ( upgrade is changed and
+      wireguard_manage_services and
+      wireguard_interfaces[item]['service'] is defined and
+      wireguard_upgrade_restart and
+      ansible_os_family == 'Darwin' )
 

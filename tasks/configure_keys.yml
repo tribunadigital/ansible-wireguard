@@ -1,29 +1,34 @@
 ---
 - name: 'Set var privatekey is empty'
-  set_fact:
+  ansible.builtin.set_fact:
     privatekey: {}
 
 - name: "Read private key {{ item }}"
-  stat:
-    path: "/etc/wireguard/privatekey_{{ item }}"
+  ansible.builtin.stat:
+    path: "{{ wireguard_conf_dir }}/privatekey_{{ item }}"
   register: privatekey
 
 - name: "Generate wireguard keys {{ item }}"
-  shell: "umask 077; wg genkey | tee /etc/wireguard/privatekey_{{ item }} | wg pubkey > /etc/wireguard/publickey_{{ item }}"
+  ansible.builtin.shell: |
+    {{ 'export PATH="' + wireguard_macos_shell_env_path + '"' if ansible_os_family == 'Darwin' }}
+    umask 077
+    wg genkey | tee {{ wireguard_conf_dir }}/privatekey_{{ item }} | wg pubkey > {{ wireguard_conf_dir }}/publickey_{{ item }}
+  args:
+    executable: /bin/bash
   when: not privatekey.stat.exists
 
 - name: "Read private key {{ item }}"
-  slurp:
-    src: "/etc/wireguard/privatekey_{{ item }}"
+  ansible.builtin.slurp:
+    src: "{{ wireguard_conf_dir }}/privatekey_{{ item }}"
   register: privatedata
 
 - name: "Read public key {{ item }}"
-  slurp:
-    src: "/etc/wireguard/publickey_{{ item }}"
+  ansible.builtin.slurp:
+    src: "{{ wireguard_conf_dir }}/publickey_{{ item }}"
   register: publicdata
 
 - name: 'Set var private and public'
-  set_fact:
+  ansible.builtin.set_fact:
     private: >
       {%  set _private = private | default({}) -%}
       {%- set x=_private.__setitem__(item, privatedata) -%}

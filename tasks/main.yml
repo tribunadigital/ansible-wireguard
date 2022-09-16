@@ -1,59 +1,59 @@
 ---
-- include_tasks: "{{ ansible_os_family | lower }}_packages.yml"
+- name: 'Install and upgrade tasks'
+  block:
+
+    - name: 'Include packages tasks'
+      ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}_packages.yml"
+
+    - name: "Create {{ wireguard_conf_dir }}"
+      ansible.builtin.file:
+        path: "{{ wireguard_conf_dir }}"
+        state: directory
+        owner: root
+
   tags:
     - wireguard_install
     - wireguard_upgrade
 
-- name: Create /etc/wireguard
-  file:
-    path: /etc/wireguard
-    state: directory
-    owner: root
-    group: root
-  tags:
-    - wireguard_install
-    - wireguard_upgrade
+- name: 'Install, upgrade and configure tasks'
+  block:
 
-- name: 'Create script for sunc routes'
-  template:
-    src: wg-routes.j2
-    dest: '/usr/local/bin/wg-routes'
-    mode: '0755'
-    validate: '/bin/bash -n %s'
+    - name: 'Create diretory /usr/local/bin'
+      ansible.builtin.file:
+        path: /usr/local/bin
+        state: directory
+        mode: '0755'
+
+    - name: 'Create script for sunc routes'
+      ansible.builtin.template:
+        src: wg-routes.j2
+        dest: '/usr/local/bin/wg-routes'
+        mode: '0755'
+        validate: '/bin/bash -n %s'
+
   tags:
     - wireguard_install
     - wireguard_upgrade
     - wireguard_configure
 
-- name: 'Create wireguard systemd file'
-  template:
-    src: wg-quick.service.j2
-    dest: '/lib/systemd/system/wg-quick@.service'
-    mode: '0644'
-  register: systemd_wg
-  tags:
-    - wireguard_install
-    - wireguard_upgrade
-
-- name: 'Systemd daemon reload'
-  command: 'systemctl daemon-reload'
-  when: systemd_wg is changed
-  tags:
-    - wireguard_install
-    - wireguard_upgrade
-
-- include_tasks: configure_keys.yml
+- name: 'Include configure keys tasks'
+  ansible.builtin.include_tasks: configure_keys.yml
   loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
     - wireguard_configure
   when: wireguard_manage_keys
 
-- include_tasks: configure_network.yml
+- name: 'Include configure network tasks'
+  ansible.builtin.include_tasks: configure_network.yml
   loop: "{{ wireguard_interfaces.keys() | list }}"
+  loop_control:
+    loop_var: item
+    index_var: index
   tags:
     - wireguard_configure
 
-- include_tasks: restart.yml
+- name: 'Include restart tasks'
+  ansible.builtin.include_tasks: restart.yml
   loop: "{{ wireguard_interfaces.keys() | list }}"
   tags:
     - wireguard_upgrade

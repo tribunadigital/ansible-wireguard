@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>no.corporate.wireguard.{{ item }}</string>
+    <key>RunAtLoad</key>
+    <{{ 'true' if wireguard_interfaces[item]['service'] is defined and wireguard_interfaces[item]['service'] else 'false' }}/>
+    <key>OnDemand</key>
+    <false/>
+    <key>Disabled</key>
+    <false/>
+    <key>WatchPaths</key>
+    <array>
+        <string>{{ wireguard_conf_dir }}</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>{{ wireguard_conf_dir }}</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ wireguard_macos_bin_path }}/wg-quick</string>
+        <string>up</string>
+        <string>{{ wireguard_conf_dir }}/{{ item }}.conf</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>{{ wireguard_macos_shell_env_path }}</string>
+    </dict>
+    <key>StandardErrorPath</key>
+    <string>/Users/{{ ansible_user }}/Library/Logs/wireguard/no.corporate.wireguard.{{ item }}.stderr</string>
+    <key>StandardOutPath</key>
+    <string>/Users/{{ ansible_user }}/Library/Logs/wireguard/no.corporate.wireguard.{{ item }}.stdout</string>
+</dict>
+</plist>

@@ -1,6 +1,6 @@
 ---
 - name: Install wireguard
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items:

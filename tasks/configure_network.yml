@@ -1,36 +1,84 @@
 ---
 - name: "Configure {{ item }}"
-  template:
+  ansible.builtin.template:
     src: wgX.conf.j2
-    dest: "/etc/wireguard/{{ item }}.conf"
+    dest: "{{ wireguard_conf_dir }}/{{ item }}.conf"
     mode: '0400'
   register: configuration
 
-- name: "Manage wg-quick@{{ item }} service"
-  service:
-    name: "wg-quick@{{ item }}"
-    state: "{{ 'started' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
-    enabled: "{{ wireguard_interfaces[item]['service'] }}"
-  tags: install
-  when: (wireguard_manage_services and wireguard_interfaces[item]['service'] is defined)
+- name: 'Linux tasks'
+  block:
 
-- name: "Sync config of wireguard interface {{ item }}"
-  shell: "wg syncconf {{ item }} <(wg-quick strip {{ item }})"
+    - name: 'Create wireguard systemd file'
+      ansible.builtin.template:
+        src: wg-quick.service.j2
+        dest: '/lib/systemd/system/wg-quick@.service'
+        mode: '0644'
+      register: systemd_wg
+
+    - name: 'Systemd daemon reload'
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      when: systemd_wg is changed
+
+    - name: "Manage wg-quick@{{ item }} service"
+      ansible.builtin.systemd:
+        name: "wg-quick@{{ item }}.service"
+        state: "{{ 'started' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
+        enabled: "{{ wireguard_interfaces[item]['service'] }}"
+      when: >
+        ( wireguard_manage_services and 
+          wireguard_interfaces[item]['service'] is defined )
+
+  when: ansible_os_family != 'Darwin'
+
+- name: 'MacOS tasks'
+  block:
+
+    - name: 'Create wireguard launchd file'
+      ansible.builtin.template:
+        src: wg-launchd.plist.j2
+        dest: "/Library/LaunchDaemons/no.corporate.wireguard.{{ item }}.plist"
+        mode: '0644'
+      register: launchd_wg
+
+    - name: 'Launchd daemon reload'
+      community.general.launchd:
+        name: "no.corporate.wireguard.{{ item }}"
+        state: reloaded
+      when: launchd_wg is changed
+
+    - name: "Manage launchd {{ item }} service"
+      community.general.launchd:
+        name: "no.corporate.wireguard.{{ item }}"
+        state: "{{ 'started' if wireguard_interfaces[item]['service'] == 'yes' else 'stopped' }}"
+      when: >
+        ( wireguard_manage_services and
+          wireguard_interfaces[item]['service'] is defined )
+
+  when: ansible_os_family == 'Darwin'
+
+- name: "Sync config of wireguard interface {{ 'utun' + index | string if ansible_os_family == 'Darwin' else item }}"
+  ansible.builtin.shell: |
+    {{ 'export PATH="' + wireguard_macos_shell_env_path + '"' if ansible_os_family == 'Darwin' }}
+    wg syncconf {{ 'utun' + index | string if ansible_os_family == 'Darwin' else item }} <(wg-quick strip {{ item }})
   args:
     executable: /bin/bash
   when: >
-    (configuration is changed and
+    ( configuration is changed and
       wireguard_manage_services and
       wireguard_interfaces[item]['service'] is defined and
-      wireguard_interfaces[item]['service'] == 'yes')
+      wireguard_interfaces[item]['service'] == 'yes' )
 
-- name: "Sync routes of wireguard interface {{ item }}"
-  shell: "/usr/local/bin/wg-routes {{ item }}"
+- name: "Sync routes of wireguard interface {{ 'utun' + index | string if ansible_os_family == 'Darwin' else item }}"
+  ansible.builtin.shell: |
+    {{ 'export PATH="' + wireguard_macos_shell_env_path + '"' if ansible_os_family == 'Darwin' }}
+    /usr/local/bin/wg-routes {{ 'utun' + index | string if ansible_os_family == 'Darwin' else item }}
   args:
     executable: /bin/bash
   when: >
-    (configuration is changed and
+    ( configuration is changed and
       wireguard_manage_services and
       wireguard_interfaces[item]['service'] is defined and
-      wireguard_interfaces[item]['service'] == 'yes')
+      wireguard_interfaces[item]['service'] == 'yes' )
 
