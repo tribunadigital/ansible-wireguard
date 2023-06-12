@@ -22,7 +22,7 @@ for i in $(while read -r _ i; do for i in $i; do [[ $i =~ ^[0-9a-z:.]+/[0-9]+$ ]
   echo "$i"
 done | sed "s|/32||" | sort > $NEW_ROUTES_FILE
 
-ip route | grep "\s${INTERFACE}\s" | cut -d ' ' -f 1 {{ '| sed "s|/32||"' if ansible_os_family == 'Darwin' }} | sort > $OLD_ROUTES_FILE
+ip route | grep "\s${INTERFACE}\b" | cut -d ' ' -f 1 {{ '| sed "s|/32||"' if ansible_os_family == 'Darwin' }} | sort > $OLD_ROUTES_FILE
 
 for i in `diff $NEW_ROUTES_FILE $OLD_ROUTES_FILE | grep '<' | cut -d ' ' -f 2`; do
   ip route add $i dev $INTERFACE
