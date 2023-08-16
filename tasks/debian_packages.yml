@@ -9,10 +9,11 @@
 
 - name: Install wireguard-dkms
   apt:
-    name: "{{ 'wireguard-dkms=' + wireguard_dkms_version if wireguard_version != '' else 'wireguard-dkms' }}"
+    name: "{{ 'wireguard-dkms=' + wireguard_dkms_version if wireguard_dkms_version != '' else 'wireguard-dkms' }}"
     state: present
     update_cache: yes
   register: upgrade
+  when: wireguard_dkms_manage
   tags:
     - wireguard_install
     - wireguard_upgrade
@@ -22,7 +23,6 @@
     name: "{{ 'wireguard=' + wireguard_version if wireguard_version != '' else 'wireguard' }}"
     state: present
     update_cache: yes
-  register: upgrade
   tags:
     - wireguard_install
     - wireguard_upgrade

@@ -215,11 +215,11 @@ server3 wg0_ipv4=10.0.0.3/32
 Supported platforms
 -------------------
 
-- Arch Linux
 - Debian
 - EL7 and derivatives
 - Fedora
 - Ubuntu
+- MacOS
 
 License
 -------

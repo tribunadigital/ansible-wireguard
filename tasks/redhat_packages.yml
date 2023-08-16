@@ -14,42 +14,20 @@
   tags:
     - wireguard_install
 
-- name: Install wireguard-dkms on Fedora
+- name: Install wireguard-dkms on Fedora, RedHat, CentOS
   ansible.builtin.package:
-    name: "{{ 'wireguard-dkms-' + wireguard_version if wireguard_version != '' else 'wireguard-dkms' }}"
+    name: "{{ 'wireguard-dkms-' + wireguard_dkms_version if wireguard_dkms_version != '' else 'wireguard-dkms' }}"
     state: present
   register: upgrade
-  when: ansible_distribution == "Fedora"
   tags:
     - wireguard_install
     - wireguard_upgrade
 
-- name: Install wireguard-tools on Fedora
+- name: Install wireguard-tools on Fedora, RedHat, CentOS
   ansible.builtin.package:
     name: "{{ 'wireguard-tools-' + wireguard_tools_version if wireguard_tools_version != '' else 'wireguard-tools' }}"
     state: present
   register: upgrade
-  when: ansible_distribution == "Fedora"
-  tags:
-    - wireguard_install
-    - wireguard_upgrade
-
-- name: Install wireguard-dkms on RedHat and CentOS
-  ansible.builtin.package:
-    name: "{{ 'wireguard-dkms-' + wireguard_version if wireguard_version != '' else 'wireguard-dkms' }}"
-    state: present
-  register: upgrade
-  when: ansible_distribution != "Fedora"
-  tags:
-    - wireguard_install
-    - wireguard_upgrade
-
-- name: Install wireguard-tools on RedHat and CentOS
-  ansible.builtin.package:
-    name: "{{ 'wireguard-tools-' + wireguard_tools_version if wireguard_tools_version != '' else 'wireguard-tools' }}"
-    state: present
-  register: upgrade
-  when: ansible_distribution != "Fedora"
   tags:
     - wireguard_install
     - wireguard_upgrade

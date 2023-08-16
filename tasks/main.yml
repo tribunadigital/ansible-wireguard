@@ -55,6 +55,7 @@
 - name: 'Include restart tasks'
   ansible.builtin.include_tasks: restart.yml
   loop: "{{ wireguard_interfaces.keys() | list }}"
+  when: upgrade is defined
   tags:
     - wireguard_upgrade
 

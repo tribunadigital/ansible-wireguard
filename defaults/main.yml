@@ -5,6 +5,7 @@ wireguard_manage_services: True
 wireguard_upgrade_restart: True
 wireguard_version: ''
 wireguard_dkms_version: ''
+wireguard_dkms_manage: False
 wireguard_tools_version: ''
 wireguard_macos_bin_path: '/opt/homebrew/bin'
 wireguard_macos_shell_env_path: '/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
