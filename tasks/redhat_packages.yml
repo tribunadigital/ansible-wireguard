@@ -27,7 +27,6 @@
   ansible.builtin.package:
     name: "{{ 'wireguard-tools-' + wireguard_tools_version if wireguard_tools_version != '' else 'wireguard-tools' }}"
     state: present
-  register: upgrade
   tags:
     - wireguard_install
     - wireguard_upgrade
