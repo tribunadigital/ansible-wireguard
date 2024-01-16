@@ -20,6 +20,7 @@
     name: "{{ 'wireguard-dkms-' + wireguard_dkms_version if wireguard_dkms_version != '' else 'wireguard-dkms' }}"
     state: present
   register: upgrade
+  when: ansible_distribution_major_version is version('9', '<')
   tags:
     - wireguard_install
     - wireguard_upgrade
